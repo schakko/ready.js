@@ -134,7 +134,7 @@ function startProcessing() {
           logger.log("JSLINT success : " + file);
           compile(file, aggregate);
         } else {
-          logger.log("JSLINT error : " + file);
+          logger.error("JSLINT error : " + file);
           util.showJslintErrors(jslint);
           process.exit(1);
         }
@@ -142,6 +142,14 @@ function startProcessing() {
     } else {
       compile(file, aggregate);
     }
+  });
+
+  r.vows(config.vows, function(error, vows, stderr) {
+    if (stderr !== undefined && stderr.length > 0) {
+		logger.error("VOWS error: " + stderr);
+	} else {
+		console.log(vows);
+	}
   });
 }
 
@@ -160,7 +168,6 @@ function watchFiles() {
   });
 }
 
-
 // If no arg, show usage
 if (argv.installcompiler || argv.i) {
   // install compiler.jar
@@ -174,3 +181,4 @@ if (argv.installcompiler || argv.i) {
 } else {
   startProcessing();
 }
+

@@ -7,12 +7,13 @@
   "bin" : { "readyjs" : "./bin/ready.js" },
   "repository" : {
     "type" : "git",
-    "url" : "https://dsimard@github.com/dsimard/ready.js.git"
+    "url" : "https://schakko@github.com/schakko/ready.js.git"
   },
   "dependencies" : {
     "readyjslint" : "0.0.4",
     "restler-aaronblohowiak" : "0.0.2",
-    "optimist" : "0.1.6"
+    "optimist" : "0.1.6",
+    "colors" : "0.5.0",
   },
-  "engines" : {"node" : ">=0.4.0"}
+  "engines" : {"node" : ">=0.5.0"}
 }
