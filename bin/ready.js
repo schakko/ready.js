@@ -3,10 +3,12 @@ var r = require("../lib/ready"),
   fs = require("fs"),
   sys = require("sys"),
   util = require("../lib/utils"),
+  colors = require("colors"),
   argv = require('optimist').argv,
   logger = require("../lib/logger"),
   config = require("../lib/config"),
-  inspect = require("util").inspect;
+  inspect = require("util").inspect,
+  internal_util = require("util");
 
 var aggregates = [];
 
@@ -124,45 +126,67 @@ function aggregateAll() {
   }
 }
 
+function printJsLint(file, obj, doCompilation, exitOnError) {
+  if (obj.jslint.success) {
+    logger.log("JSLINT success : " + file);
+    if (doCompilation) {
+      compile(file, aggregate);
+    }
+  } else {
+    logger.error("JSLINT error : " + file);
+    util.showJslintErrors(obj.jslint.data);
+  }	
+
+  if (exitOnError) {
+    process.exit(1);
+  }
+}
+
+function printVows(object) {
+  if (object.vows.stderr !== undefined && object.vows.stderr.length > 0) {
+    logger.error("VOWS error: " + object.vows.stderr);
+  } else {
+	console.log(object.vows.data);
+  }
+}
+
 function startProcessing() {
   // Start the process
   util.forEachJs(function(file) {
     if (config.runJslint && !util.isExcluded(file)) {
       // Run jslint
-      r.jslint(file, function(success, jslint) {
-        if (success) {
-          logger.log("JSLINT success : " + file);
-          compile(file, aggregate);
-        } else {
-          logger.error("JSLINT error : " + file);
-          util.showJslintErrors(jslint);
-          process.exit(1);
-        }
+      r.jslint(file, function(obj) {
+		printJsLint(file, obj, true, true);
       });
     } else {
       compile(file, aggregate);
     }
   });
 
-  r.vows(config.vows, function(error, vows, stderr) {
-    if (stderr !== undefined && stderr.length > 0) {
-		logger.error("VOWS error: " + stderr);
-	} else {
-		console.log(vows);
-	}
+  r.vows(config.vows, function(object) {
+	printVows(object);
   });
 }
 
 function watchFiles() {
+  r.vows(config.vows, function(val) { printVows(val); });
+
   util.forEachJs(function(file) {
     if (!util.isExcluded(file)) {
-      r.watch(file, function(success, jslint) {
-        if (success) {
-          logger.log("JSLint on '" + file + "' : OK");
-        } else {
-          logger.log("JSLint error on '" + file + "'");
-          util.showJslintErrors(jslint);
+      r.watch(file, function(val) {
+		internal_util.puts("\033[2J");
+		internal_util.puts("-----------------------------------------".white.bold);
+		internal_util.puts(("Change " + (new Date())).white.bold);
+		internal_util.puts(("File " + file).white.bold);
+		internal_util.puts("-----------------------------------------".white.bold);
+
+        if (val.jslint) {
+		  printJsLint(file, val, false, false);
         }
+
+		if (val.vows) {
+		  printVows(val);
+	    }
       });
     }
   });

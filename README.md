@@ -22,6 +22,8 @@
       -o | --order            FILES     specify an order (ex : --order "jquery.js, jquery.ui.js")
       -e | --exclude          FILES     exclude the FILES from JSLint and compilation (ex : -e "jquery.js")
       -i | --installcompiler  PATH      install the google compiler specified by PATH
+      --vows                  FILES     run this files as vows
+      --vowsexec              FILE      path to vows if not in $PATH
       -compiledext            EXT       the compiled javascripts will have EXT as an extension
       -aggregateto            FILENAME  the compiled javascripts will be aggregated to this FILENAME
       
@@ -29,6 +31,7 @@
       --nojslint              will not run JSLint
       --nocompiler            will not run the compiler
       --norecursive           will not look for files recursively
+      --novows                will not run vows
 
     [Use a config file]
     readyjs path/to/config.file.js [options] (see http://j.mp/readyjsconfig)
